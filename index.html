@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Feed</title>
+  <style>
+    /* Instagram post styling */
+    .instagram-post {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #e1e1e1;
+    }
+
+    .instagram-post img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    .instagram-post p {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .instagram-post a {
+      display: block;
+      color: #3897f0; /* Instagram blue */
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="instagram-feed"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Replace 'YOUR_LONG_LIVED_ACCESS_TOKEN' with your actual long-lived access token
+      const accessToken = 'IGQWROdC1MQ0t3XzlkOTNqUUpfeEFLRFZA6T00wenJiVjFZASENnVGRRa2NWMFg4YkJpbk9pZAkVWR1FoUUIyN0k0TmltVEZACb3g5MkozQWQyTzliUHVqY2RVQlduTDQ4aElISF84Y1JpaTFpQ0UxN0trSmlpTkxZAeHMZD';
+      const apiUrl = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink&access_token=${accessToken}`;
+
+      // Function to fetch Instagram feed data
+      async function fetchInstagramFeed() {
+        try {
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+          displayInstagramFeed(data);
+        } catch (error) {
+          console.error('Error fetching Instagram feed:', error);
+        }
+      }
+
+      // Function to display Instagram feed on the page
+      function displayInstagramFeed(data) {
+        const instagramFeedElement = document.getElementById('instagram-feed');
+        data.data.forEach(post => {
+          const postElement = document.createElement('div');
+          postElement.classList.add('instagram-post');
+          const imageElement = document.createElement('img');
+          imageElement.src = post.media_url;
+          const captionElement = document.createElement('p');
+          captionElement.textContent = post.caption || 'No caption';
+          const permalinkElement = document.createElement('a');
+          permalinkElement.textContent = 'View on Instagram';
+          permalinkElement.href = post.permalink;
+          permalinkElement.target = '_blank'; // Open link in a new tab
+          postElement.appendChild(imageElement);
+          postElement.appendChild(captionElement);
+          postElement.appendChild(permalinkElement);
+          instagramFeedElement.appendChild(postElement);
+        });
+      }
+
+      // Fetch Instagram feed data when the page loads
+      fetchInstagramFeed();
+    });
+  </script>
+</body>
+</html>
