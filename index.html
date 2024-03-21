@@ -3,37 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instagram Feed</title>
+  <title>321 Mafia Instagram Feed</title>
   <style>
-    /* Instagram post styling */
-    .instagram-post {
-      margin-bottom: 20px;
-      padding: 10px;
-      border: 1px solid #e1e1e1;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000000; /* Background color */
+      color: #ffffff; /* Text color */
     }
 
-    .instagram-post img {
+    .header {
+      background-color: #000000; /* Header background color */
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .instagram-feed {
+      display: flex;
+      flex-direction: column; /* Stack posts vertically */
+      align-items: center; /* Center posts horizontally */
+      padding-top: 20px; /* Add space at the top */
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .profile-icon {
+      width: 39px;
+      height: 39px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 10px;
+    }
+
+    .profile-icon img {
       width: 100%;
       height: auto;
+    }
+
+    .profile-name {
+      font-size: 14px;
+    }
+
+    .instagram-post-container {
+      width: 70%; /* Set width of each post container */
+      max-width: 500px; /* Set maximum width */
+      margin: 10px;
+    }
+
+    .instagram-post {
+      position: relative;
+      border: 1px solid #e1e1e1;
       border-radius: 5px;
+      overflow: hidden;
+      background-color: #000000; /* Post background color */
+    }
+
+    .instagram-post img,
+    .instagram-post video {
+      width: 100%;
+      height: auto;
+      display: block;
     }
 
     .instagram-post p {
       font-size: 14px;
-      margin-top: 10px;
+      margin: 10px;
     }
 
     .instagram-post a {
       display: block;
-      color: #3897f0; /* Instagram blue */
+      color: #3897f0; /* Link color */
       font-weight: bold;
       text-decoration: none;
-      margin-top: 5px;
+      margin: 5px 10px;
     }
   </style>
 </head>
 <body>
-  <div id="instagram-feed"></div>
+  <div class="header">
+    <h1>321 Mafia Instagram feed</h1>
+  </div>
+
+  <div class="instagram-feed" id="instagram-feed"></div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -44,7 +107,11 @@
       // Function to fetch Instagram feed data
       async function fetchInstagramFeed() {
         try {
-          const response = await fetch(apiUrl);
+          const response = await fetch(apiUrl, {
+            headers: {
+              'Accept': 'image/jpeg, image/avif, image/webp, video/mp4'
+            }
+          });
           const data = await response.json();
           displayInstagramFeed(data);
         } catch (error) {
@@ -55,21 +122,49 @@
       // Function to display Instagram feed on the page
       function displayInstagramFeed(data) {
         const instagramFeedElement = document.getElementById('instagram-feed');
+
         data.data.forEach(post => {
+          const postContainer = document.createElement('div');
+          postContainer.classList.add('instagram-post-container');
+
+          const profileInfo = document.createElement('div');
+          profileInfo.classList.add('profile-info');
+          const profileIcon = document.createElement('div');
+          profileIcon.classList.add('profile-icon');
+          // Replace 'profile.jpg' with the URL of your profile image
+          profileIcon.innerHTML = '<img src="profile.jpg" alt="Profile Image">';
+          profileInfo.appendChild(profileIcon);
+          const profileName = document.createElement('p');
+          profileName.classList.add('profile-name');
+          // Replace 'Your Name' with your actual profile name
+          profileName.textContent = '321mvfia';
+          profileInfo.appendChild(profileName);
+          postContainer.appendChild(profileInfo);
+
           const postElement = document.createElement('div');
           postElement.classList.add('instagram-post');
-          const imageElement = document.createElement('img');
-          imageElement.src = post.media_url;
+          if (post.media_type === 'IMAGE') {
+            const imageElement = document.createElement('img');
+            imageElement.src = post.media_url;
+            postElement.appendChild(imageElement);
+          } else if (post.media_type === 'VIDEO') {
+            const videoElement = document.createElement('video');
+            videoElement.src = post.media_url;
+            videoElement.controls = true;
+            videoElement.autoplay = true; // Autoplay the video
+            videoElement.muted = true; // Mute the video
+            postElement.appendChild(videoElement);
+          }
           const captionElement = document.createElement('p');
           captionElement.textContent = post.caption || 'No caption';
           const permalinkElement = document.createElement('a');
           permalinkElement.textContent = 'View on Instagram';
           permalinkElement.href = post.permalink;
-          permalinkElement.target = '_blank'; // Open link in a new tab
-          postElement.appendChild(imageElement);
+          permalinkElement.target = '_blank';
           postElement.appendChild(captionElement);
           postElement.appendChild(permalinkElement);
-          instagramFeedElement.appendChild(postElement);
+          postContainer.appendChild(postElement);
+          instagramFeedElement.appendChild(postContainer);
         });
       }
 
